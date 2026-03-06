@@ -205,23 +205,33 @@ function renderChart(dataset, topSongs, values) {
       },
       scales: {
         x: {
+          min: -4,
+          max: 4,
           title: {
             display: true,
             text: '← Painful / Distant relationship ··· Committed / Together →',
             color: '#a78bfa',
             font: { family: 'Georgia', size: 11 },
           },
-          ticks: { color: '#7c3aed88' },
+          ticks: {
+            color: '#7c3aed88',
+            stepSize: 1,
+          },
           grid: { color: 'rgba(124, 58, 237, 0.12)' },
         },
         y: {
+          min: -4,
+          max: 4,
           title: {
             display: true,
             text: '↑ Happy & Positive mood ··· Sad & Troubled ↓',
             color: '#a78bfa',
             font: { family: 'Georgia', size: 11 },
           },
-          ticks: { color: '#7c3aed88' },
+          ticks: {
+            color: '#7c3aed88',
+            stepSize: 1,
+          },
           grid: { color: 'rgba(124, 58, 237, 0.12)' },
         },
       },
