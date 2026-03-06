@@ -46,6 +46,7 @@ const resetViewEl = document.getElementById('reset-view');
 
 let catalogs = null;
 let chart = null;
+const FIXED_AXIS_TICKS = [-3, -2, -1, 0, 1, 2, 3];
 
 function getSelectedDatasetMode() {
   return document.querySelector('input[name="dataset"]:checked')?.value || 'study';
@@ -208,6 +209,10 @@ function renderChart(dataset, topSongs, values) {
         x: {
           min: -3,
           max: 3,
+          bounds: 'ticks',
+          afterBuildTicks: (axis) => {
+            axis.ticks = FIXED_AXIS_TICKS.map((value) => ({ value }));
+          },
           title: {
             display: true,
             text: '← Painful / Distant relationship ··· Committed / Together →',
@@ -217,12 +222,19 @@ function renderChart(dataset, topSongs, values) {
           ticks: {
             color: '#7c3aed88',
             stepSize: 1,
+            autoSkip: false,
+            padding: 10,
+            font: { size: 12 },
           },
           grid: { color: 'rgba(124, 58, 237, 0.12)' },
         },
         y: {
           min: -3,
           max: 3,
+          bounds: 'ticks',
+          afterBuildTicks: (axis) => {
+            axis.ticks = FIXED_AXIS_TICKS.map((value) => ({ value }));
+          },
           title: {
             display: true,
             text: '↑ Happy & Positive mood ··· Sad & Troubled ↓',
@@ -232,6 +244,9 @@ function renderChart(dataset, topSongs, values) {
           ticks: {
             color: '#7c3aed88',
             stepSize: 1,
+            autoSkip: false,
+            padding: 14,
+            font: { size: 13 },
           },
           grid: { color: 'rgba(124, 58, 237, 0.12)' },
         },
