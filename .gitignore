@@ -5,3 +5,5 @@ venv/
 .env
 .DS_Store
 Thumbs.db
+flask_out.txt
+flask_err.txt
