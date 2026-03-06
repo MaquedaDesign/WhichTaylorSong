@@ -179,9 +179,14 @@
       line-height: 1.5;
     }
 
+    .chart-wrapper {
+      position: relative;
+      height: 480px;
+    }
+
     #songChart {
       width: 100%;
-      height: 480px;
+      height: 100%;
     }
 
     .dataset-card {
@@ -240,7 +245,7 @@
         padding: 24px 16px 28px;
       }
 
-      #songChart {
+      .chart-wrapper {
         height: 640px;
       }
     }
@@ -290,7 +295,7 @@
     <div class="chart-card">
       <div class="chart-label">✦ Your position in Taylor Swift's universe</div>
       <p class="chart-desc">Each dot is one of the {{ song_count }} songs, projected onto two composite emotional dimensions. Pink ● = your top 5 matches &nbsp;·&nbsp; ★ = you.</p>
-      <canvas id="songChart"></canvas>
+      <div class="chart-wrapper"><canvas id="songChart"></canvas></div>
     </div>
 
     <div class="actions">

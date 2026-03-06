@@ -421,9 +421,14 @@
       line-height: 1.5;
     }
 
+    .chart-wrapper {
+      position: relative;
+      height: 480px;
+    }
+
     #songChart {
       width: 100%;
-      height: 480px;
+      height: 100%;
     }
 
     footer {
@@ -452,7 +457,7 @@
         padding: 24px 16px 28px;
       }
 
-      #songChart {
+      .chart-wrapper {
         height: 640px;
       }
     }
@@ -603,7 +608,7 @@
         <div class="chart-card">
           <div class="chart-label">✦ Your position in Taylor Swift's universe</div>
           <p class="chart-desc" id="chart-description"></p>
-          <canvas id="songChart"></canvas>
+          <div class="chart-wrapper"><canvas id="songChart"></canvas></div>
         </div>
 
         <div class="actions">
@@ -615,6 +620,6 @@
     <footer>taylorswift package by Megan Mansfield &amp; Adina Feinstein · MIT License · Static version for GitHub Pages</footer>
   </div>
 
-  <script src="./app.js?v=4"></script>
+  <script src="./app.js?v=5"></script>
 </body>
 </html>
