@@ -179,6 +179,11 @@
       line-height: 1.5;
     }
 
+    #songChart {
+      width: 100%;
+      height: 420px;
+    }
+
     .dataset-card {
       background: rgba(255,255,255,0.06);
       border: 1px solid rgba(192,132,252,0.25);
@@ -228,6 +233,16 @@
       margin-top: 32px;
       font-size: 0.8rem;
       color: #7c3aed88;
+    }
+
+    @media (max-width: 700px) {
+      .chart-card {
+        padding: 20px 18px 24px;
+      }
+
+      #songChart {
+        height: 560px;
+      }
     }
   </style>
 </head>
@@ -363,6 +378,7 @@
       },
       options: {
         responsive: true,
+        maintainAspectRatio: false,
         layout: { padding: { top: 24, right: 20 } },
         plugins: {
           legend: {
@@ -386,8 +402,8 @@
         },
         scales: {
           x: {
-            min: -4,
-            max: 4,
+            min: -3,
+            max: 3,
             title: {
               display: true,
               text: '← Painful / Distant relationship ··· Committed / Together →',
@@ -401,8 +417,8 @@
             grid:  { color: 'rgba(124, 58, 237, 0.12)' }
           },
           y: {
-            min: -4,
-            max: 4,
+            min: -3,
+            max: 3,
             title: {
               display: true,
               text: '↑ Happy & Positive mood ··· Sad & Troubled ↓',

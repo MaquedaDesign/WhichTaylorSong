@@ -203,10 +203,11 @@ function renderChart(dataset, topSongs, values) {
           padding: 10,
         },
       },
+      maintainAspectRatio: false,
       scales: {
         x: {
-          min: -4,
-          max: 4,
+          min: -3,
+          max: 3,
           title: {
             display: true,
             text: '← Painful / Distant relationship ··· Committed / Together →',
@@ -220,8 +221,8 @@ function renderChart(dataset, topSongs, values) {
           grid: { color: 'rgba(124, 58, 237, 0.12)' },
         },
         y: {
-          min: -4,
-          max: 4,
+          min: -3,
+          max: 3,
           title: {
             display: true,
             text: '↑ Happy & Positive mood ··· Sad & Troubled ↓',
