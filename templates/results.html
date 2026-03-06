@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Your Taylor Swift Songs</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Georgia', serif;
+      background: linear-gradient(135deg, #1a0533 0%, #3b0764 50%, #1a0533 100%);
+      min-height: 100vh;
+      padding: 40px 16px;
+      color: #f3e8ff;
+    }
+
+    .container {
+      max-width: 740px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    header .star { font-size: 2rem; }
+
+    header h1 {
+      font-size: 2.2rem;
+      background: linear-gradient(90deg, #f9a8d4, #e879f9, #c084fc, #f9a8d4);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 8px 0 4px;
+      letter-spacing: 1px;
+    }
+
+    header p {
+      font-size: 0.95rem;
+      color: #d8b4fe;
+      font-style: italic;
+    }
+
+    .song-card {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(192, 132, 252, 0.25);
+      border-radius: 16px;
+      padding: 24px 28px;
+      margin-bottom: 18px;
+      backdrop-filter: blur(6px);
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+      transition: border-color 0.2s;
+    }
+
+    .song-card:hover {
+      border-color: rgba(233, 121, 249, 0.5);
+    }
+
+    .song-card.top-pick {
+      border-color: rgba(249, 168, 212, 0.5);
+      background: rgba(147, 51, 234, 0.12);
+    }
+
+    .rank {
+      font-size: 2rem;
+      font-weight: bold;
+      background: linear-gradient(180deg, #f9a8d4, #9333ea);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      min-width: 36px;
+      line-height: 1;
+      padding-top: 2px;
+    }
+
+    .song-info { flex: 1; }
+
+    .song-title {
+      font-size: 1.25rem;
+      font-weight: bold;
+      color: #f9a8d4;
+      margin-bottom: 4px;
+    }
+
+    .song-album {
+      font-size: 0.82rem;
+      color: #a78bfa;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 10px;
+    }
+
+    .song-desc {
+      font-size: 0.9rem;
+      line-height: 1.6;
+      color: #d8b4fe;
+      font-style: italic;
+    }
+
+    .song-link {
+      margin-top: 10px;
+    }
+
+    .song-link a {
+      font-size: 0.82rem;
+      color: #e879f9;
+      text-decoration: none;
+      border-bottom: 1px solid rgba(232, 121, 249, 0.4);
+      padding-bottom: 1px;
+      transition: color 0.2s, border-color 0.2s;
+    }
+
+    .song-link a:hover {
+      color: #f9a8d4;
+      border-color: #f9a8d4;
+    }
+
+    .top-badge {
+      font-size: 0.7rem;
+      background: linear-gradient(90deg, #9333ea, #ec4899);
+      color: #fff;
+      padding: 3px 10px;
+      border-radius: 20px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .actions {
+      text-align: center;
+      margin-top: 32px;
+    }
+
+    .back-btn {
+      display: inline-block;
+      padding: 14px 36px;
+      font-size: 1rem;
+      font-family: 'Georgia', serif;
+      letter-spacing: 1px;
+      background: linear-gradient(90deg, #9333ea, #ec4899);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: opacity 0.2s, transform 0.1s;
+    }
+
+    .back-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+
+    .chart-card {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(192,132,252,0.25);
+      border-radius: 16px;
+      padding: 24px 28px;
+      margin-bottom: 24px;
+      backdrop-filter: blur(6px);
+    }
+    .chart-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: #c084fc;
+      margin-bottom: 8px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid #7e22ce44;
+    }
+    .chart-desc {
+      font-size: 0.83rem;
+      color: #a78bfa;
+      font-style: italic;
+      margin-bottom: 16px;
+      line-height: 1.5;
+    }
+
+    .dataset-card {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(192,132,252,0.25);
+      border-radius: 16px;
+      padding: 20px 24px;
+      margin-bottom: 24px;
+      backdrop-filter: blur(6px);
+    }
+
+    .dataset-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: #c084fc;
+      margin-bottom: 8px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid #7e22ce44;
+    }
+
+    .dataset-title {
+      font-size: 1.05rem;
+      color: #f9a8d4;
+      margin-bottom: 8px;
+      font-weight: bold;
+    }
+
+    .dataset-desc {
+      font-size: 0.88rem;
+      color: #d8b4fe;
+      line-height: 1.6;
+    }
+
+    .source-badge {
+      font-size: 0.68rem;
+      background: rgba(236, 72, 153, 0.18);
+      color: #f9a8d4;
+      border: 1px solid rgba(249, 168, 212, 0.28);
+      padding: 3px 9px;
+      border-radius: 20px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 32px;
+      font-size: 0.8rem;
+      color: #7c3aed88;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="star">✦</div>
+      <h1>Your Taylor Swift songs</h1>
+      <p>Here are the top 5 songs that match your current mood</p>
+    </header>
+
+    <div class="dataset-card">
+      <div class="dataset-label">✦ Dataset used</div>
+      <div class="dataset-title">{{ dataset_name }} · {{ song_count }} songs</div>
+      <div class="dataset-desc">{{ dataset_note }}</div>
+    </div>
+
+    {% for song in songs %}
+    <div class="song-card {% if song.rank == 1 %}top-pick{% endif %}">
+      <div class="rank">#{{ song.rank }}</div>
+      <div class="song-info">
+        <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:4px;">
+          <div class="song-title">{{ song.title }}</div>
+          {% if song.rank == 1 %}<span class="top-badge">✦ Best match</span>{% endif %}
+          {% if song.source == 'ai_average' %}<span class="source-badge">AI averaged</span>{% endif %}
+        </div>
+        <div class="song-album">{{ song.album }}</div>
+        {% if song.description %}
+        <div class="song-desc">
+          {% if song.description_kind == 'quote' %}
+          <strong>{{ song.description_label }}:</strong> "{{ song.description }}"
+          {% else %}
+          <strong>{{ song.description_label }}:</strong> {{ song.description }}
+          {% endif %}
+        </div>
+        {% endif %}
+        {% if song.url %}
+        <div class="song-link"><a href="{{ song.url }}" target="_blank" rel="noopener">Video</a></div>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+
+    <!-- CHART -->
+    <div class="chart-card">
+      <div class="chart-label">✦ Your position in Taylor Swift's universe</div>
+      <p class="chart-desc">Each dot is one of the {{ song_count }} songs, projected onto two composite emotional dimensions. Pink ● = your top 5 matches &nbsp;·&nbsp; ★ = you.</p>
+      <canvas id="songChart"></canvas>
+    </div>
+
+    <div class="actions">
+      <a href="/" class="back-btn">✦ Try again</a>
+    </div>
+
+    <footer>taylorswift package by Megan Mansfield &amp; Adina Feinstein · MIT License</footer>
+  </div>
+
+  <script id="chart-songs-data" type="application/json">{{ chart_songs | safe }}</script>
+  <script id="top5-titles-data" type="application/json">{{ top5_titles | safe }}</script>
+  <script id="user-point-data" type="application/json">{"x": {{ user_x }}, "y": {{ user_y }}}</script>
+
+  <script>
+    Chart.register(ChartDataLabels);
+
+    const allSongs = JSON.parse(document.getElementById('chart-songs-data').textContent);
+    const top5List = JSON.parse(document.getElementById('top5-titles-data').textContent);
+    const top5Titles = new Set(top5List);
+    const userPoint = JSON.parse(document.getElementById('user-point-data').textContent);
+    const userX = userPoint.x;
+    const userY = userPoint.y;
+
+    const background   = allSongs.filter(s => !top5Titles.has(s.t));
+    const highlighted  = allSongs.filter(s =>  top5Titles.has(s.t));
+
+    // Map top5_titles list to ranked labels
+    const rankLabel = {};
+    top5List.forEach((t, i) => rankLabel[t] = `#${i+1} ${t}`);
+
+    new Chart(document.getElementById('songChart'), {
+      type: 'scatter',
+      data: {
+        datasets: [
+          {
+            label: 'All songs',
+            data: background.map(s => ({ x: s.x, y: s.y, title: s.t, album: s.a })),
+            pointRadius: 4,
+            pointHoverRadius: 6,
+            backgroundColor: 'rgba(139, 92, 246, 0.3)',
+            borderColor:     'rgba(167, 139, 250, 0.55)',
+            borderWidth: 1,
+            datalabels: { display: false }
+          },
+          {
+            label: 'Your top 5',
+            data: highlighted.map(s => ({ x: s.x, y: s.y, title: s.t, album: s.a })),
+            pointRadius: 9,
+            pointHoverRadius: 12,
+            backgroundColor: 'rgba(249, 168, 212, 0.9)',
+            borderColor: '#e879f9',
+            borderWidth: 2,
+            datalabels: {
+              display: true,
+              color: '#f9a8d4',
+              font: { size: 9, family: 'Georgia' },
+              anchor: 'end',
+              align: 'top',
+              offset: 3,
+              formatter: (v) => rankLabel[v.title] || v.title,
+              clip: false
+            }
+          },
+          {
+            label: 'You',
+            data: [{ x: userX, y: userY, title: 'You', album: '' }],
+            pointRadius: 13,
+            pointStyle: 'star',
+            pointHoverRadius: 16,
+            backgroundColor: 'rgba(255,255,255,0.95)',
+            borderColor: '#f9a8d4',
+            borderWidth: 2,
+            datalabels: {
+              display: true,
+              color: '#ffffff',
+              font: { size: 11, weight: 'bold', family: 'Georgia' },
+              anchor: 'end',
+              align: 'top',
+              offset: 4,
+              formatter: () => '★ You',
+              clip: false
+            }
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        layout: { padding: { top: 24, right: 20 } },
+        plugins: {
+          legend: {
+            labels: { color: '#d8b4fe', font: { family: 'Georgia', size: 12 } }
+          },
+          tooltip: {
+            callbacks: {
+              label: (ctx) => {
+                const d = ctx.raw;
+                if (d.title === 'You') return '★ You are here';
+                return `${d.title}  —  ${d.album}`;
+              }
+            },
+            backgroundColor: 'rgba(20, 5, 45, 0.92)',
+            titleColor: '#f9a8d4',
+            bodyColor: '#d8b4fe',
+            borderColor: '#7c3aed',
+            borderWidth: 1,
+            padding: 10
+          }
+        },
+        scales: {
+          x: {
+            title: {
+              display: true,
+              text: '← Painful / Distant relationship ··· Committed / Together →',
+              color: '#a78bfa',
+              font: { family: 'Georgia', size: 11 }
+            },
+            ticks: { color: '#7c3aed88' },
+            grid:  { color: 'rgba(124, 58, 237, 0.12)' }
+          },
+          y: {
+            title: {
+              display: true,
+              text: '↑ Happy & Positive mood ··· Sad & Troubled ↓',
+              color: '#a78bfa',
+              font: { family: 'Georgia', size: 11 }
+            },
+            ticks: { color: '#7c3aed88' },
+            grid:  { color: 'rgba(124, 58, 237, 0.12)' }
+          }
+        }
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Which Taylor Swift song are you?</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg-1: #1a0533;
+      --bg-2: #3b0764;
+      --card: rgba(255,255,255,0.06);
+      --card-border: rgba(192, 132, 252, 0.25);
+      --accent: #f9a8d4;
+      --accent-2: #e879f9;
+      --accent-3: #c084fc;
+      --text: #f3e8ff;
+      --text-soft: #d8b4fe;
+      --text-muted: #a78bfa;
+    }
+
+    body {
+      font-family: Georgia, serif;
+      background: linear-gradient(135deg, var(--bg-1) 0%, var(--bg-2) 50%, var(--bg-1) 100%);
+      min-height: 100vh;
+      padding: 40px 16px;
+      color: var(--text);
+    }
+
+    .container {
+      max-width: 740px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    header .star { font-size: 2rem; }
+
+    header h1 {
+      font-size: 2.2rem;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2), var(--accent-3), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 8px 0 4px;
+      letter-spacing: 1px;
+    }
+
+    header p {
+      font-size: 0.95rem;
+      color: var(--text-soft);
+      font-style: italic;
+    }
+
+    .section-label,
+    .chart-label,
+    .dataset-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--accent-3);
+      margin-bottom: 12px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid #7e22ce44;
+    }
+
+    .card,
+    .dataset-panel,
+    .song-card,
+    .chart-card,
+    .loading-card {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      backdrop-filter: blur(6px);
+    }
+
+    .card,
+    .dataset-panel,
+    .chart-card,
+    .loading-card {
+      padding: 24px 28px;
+      margin-bottom: 24px;
+    }
+
+    .question-block {
+      margin-bottom: 28px;
+    }
+
+    .question-block:last-child {
+      margin-bottom: 0;
+    }
+
+    .question-text {
+      font-size: 1rem;
+      line-height: 1.55;
+      color: var(--text);
+      margin-bottom: 14px;
+    }
+
+    .helper-text {
+      font-size: 0.85rem;
+      color: var(--accent-3);
+      margin-bottom: 20px;
+      font-style: italic;
+    }
+
+    .slider-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .slider-labels {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 6px;
+      border-radius: 4px;
+      background: linear-gradient(to right, #9333ea, #ec4899);
+      outline: none;
+      cursor: pointer;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--accent);
+      border: 3px solid #9333ea;
+      cursor: pointer;
+      box-shadow: 0 0 8px rgba(233, 121, 249, 0.6);
+    }
+
+    .value-bubble {
+      text-align: center;
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: var(--accent);
+      height: 24px;
+    }
+
+    .dataset-toggle {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .dataset-option {
+      display: block;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .dataset-option input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .dataset-card {
+      border: 1px solid rgba(192, 132, 252, 0.25);
+      border-radius: 14px;
+      padding: 16px 18px;
+      background: rgba(255,255,255,0.035);
+      transition: border-color 0.2s, background 0.2s, transform 0.1s;
+      min-height: 100%;
+    }
+
+    .dataset-option input:checked + .dataset-card {
+      border-color: rgba(249, 168, 212, 0.7);
+      background: rgba(147, 51, 234, 0.14);
+      box-shadow: 0 0 0 1px rgba(249, 168, 212, 0.16);
+    }
+
+    .dataset-title {
+      font-size: 0.95rem;
+      color: var(--accent);
+      margin-bottom: 6px;
+      font-weight: bold;
+    }
+
+    .dataset-meta {
+      font-size: 0.76rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--accent-3);
+      margin-bottom: 8px;
+    }
+
+    .dataset-desc {
+      font-size: 0.84rem;
+      line-height: 1.55;
+      color: var(--text-soft);
+    }
+
+    .explainer {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(192,132,252,0.2);
+      border-radius: 12px;
+      margin-bottom: 28px;
+      overflow: hidden;
+    }
+
+    .explainer summary {
+      padding: 13px 20px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      color: var(--accent-3);
+      letter-spacing: 1px;
+      list-style: none;
+      user-select: none;
+    }
+
+    .explainer summary::-webkit-details-marker { display: none; }
+    .explainer[open] summary { border-bottom: 1px solid rgba(192,132,252,0.2); }
+
+    .explainer-body {
+      padding: 16px 20px;
+      font-size: 0.875rem;
+      line-height: 1.7;
+      color: var(--text-soft);
+    }
+
+    .explainer-body strong,
+    .song-desc strong {
+      color: var(--accent);
+    }
+
+    .explainer-body p {
+      margin-bottom: 12px;
+    }
+
+    .explainer-body p:last-child {
+      margin-bottom: 0;
+    }
+
+    .dim-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 14px;
+    }
+
+    .dim-table td {
+      padding: 5px 10px;
+      font-size: 0.82rem;
+    }
+
+    .dim-table td:first-child {
+      color: var(--accent);
+      font-style: italic;
+      white-space: nowrap;
+      padding-right: 16px;
+    }
+
+    .dim-table tr:nth-child(odd) td {
+      background: rgba(255,255,255,0.03);
+      border-radius: 4px;
+    }
+
+    .mode-note {
+      margin-top: 12px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: rgba(236, 72, 153, 0.08);
+      border: 1px solid rgba(249, 168, 212, 0.16);
+      color: #f3c8ea;
+      font-size: 0.82rem;
+      line-height: 1.6;
+    }
+
+    .submit-btn,
+    .back-btn {
+      display: inline-block;
+      width: 100%;
+      padding: 16px;
+      font-size: 1.05rem;
+      font-family: Georgia, serif;
+      letter-spacing: 1px;
+      background: linear-gradient(90deg, #9333ea, #ec4899);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: opacity 0.2s, transform 0.1s;
+    }
+
+    .submit-btn:hover,
+    .back-btn:hover {
+      opacity: 0.88;
+      transform: translateY(-1px);
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .song-card {
+      padding: 24px 28px;
+      margin-bottom: 18px;
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+      transition: border-color 0.2s;
+    }
+
+    .song-card.top-pick {
+      border-color: rgba(249, 168, 212, 0.5);
+      background: rgba(147, 51, 234, 0.12);
+    }
+
+    .rank {
+      font-size: 2rem;
+      font-weight: bold;
+      background: linear-gradient(180deg, var(--accent), #9333ea);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      min-width: 36px;
+      line-height: 1;
+      padding-top: 2px;
+    }
+
+    .song-info {
+      flex: 1;
+    }
+
+    .song-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 4px;
+    }
+
+    .song-title {
+      font-size: 1.25rem;
+      font-weight: bold;
+      color: var(--accent);
+    }
+
+    .song-album {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 10px;
+    }
+
+    .song-desc {
+      font-size: 0.9rem;
+      line-height: 1.6;
+      color: var(--text-soft);
+    }
+
+    .song-link {
+      margin-top: 10px;
+    }
+
+    .song-link a {
+      font-size: 0.82rem;
+      color: var(--accent-2);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(232, 121, 249, 0.4);
+      padding-bottom: 1px;
+    }
+
+    .top-badge,
+    .source-badge {
+      font-size: 0.68rem;
+      padding: 3px 9px;
+      border-radius: 20px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .top-badge {
+      background: linear-gradient(90deg, #9333ea, #ec4899);
+      color: #fff;
+    }
+
+    .source-badge {
+      background: rgba(236, 72, 153, 0.18);
+      color: var(--accent);
+      border: 1px solid rgba(249, 168, 212, 0.28);
+    }
+
+    .actions {
+      text-align: center;
+      margin-top: 32px;
+    }
+
+    .back-btn {
+      width: auto;
+      padding: 14px 36px;
+    }
+
+    .chart-desc {
+      font-size: 0.83rem;
+      color: var(--text-muted);
+      font-style: italic;
+      margin-bottom: 16px;
+      line-height: 1.5;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 32px;
+      font-size: 0.8rem;
+      color: #7c3aed88;
+    }
+
+    @media (max-width: 700px) {
+      .dataset-toggle {
+        grid-template-columns: 1fr;
+      }
+
+      .song-card {
+        padding: 20px;
+        gap: 14px;
+      }
+
+      .slider-labels {
+        flex-direction: column;
+        gap: 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="star">✦</div>
+      <h1>Which Taylor Swift song are you?</h1>
+      <p>Answer honestly and find your perfect match</p>
+    </header>
+
+    <section id="loading" class="loading-card">
+      <div class="section-label">✦ Loading</div>
+      <p>Preparing the static catalog for GitHub Pages...</p>
+    </section>
+
+    <section id="app" class="hidden">
+      <form id="quiz-form">
+        <div class="card">
+          <div class="section-label">✦ Dataset</div>
+
+          <div class="dataset-toggle">
+            <label class="dataset-option">
+              <input type="radio" name="dataset" value="study" checked />
+              <div class="dataset-card">
+                <div class="dataset-title">Original study</div>
+                <div class="dataset-meta">149 songs · human-scored</div>
+              </div>
+            </label>
+
+            <label class="dataset-option">
+              <input type="radio" name="dataset" value="combined" />
+              <div class="dataset-card">
+                <div class="dataset-title">Expanded catalog</div>
+                <div class="dataset-meta">240 songs · study + AI extension</div>
+                <div class="dataset-desc">Scores for added songs estimated via AI analysis.</div>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <details class="explainer">
+          <summary id="explainer-summary">✦ How does this work? (Original study)</summary>
+          <div class="explainer-body" id="explainer-body"></div>
+        </details>
+
+        <div class="card">
+          <div class="section-label">✦ Relationship &amp; Love</div>
+          <p class="helper-text">If you're in a relationship, answer about your current one. Otherwise, think about your most recent or a potential one.</p>
+
+          <div class="question-block">
+            <p class="question-text">1. Which of these best describes your relationship?</p>
+            <div class="slider-wrap">
+              <div class="slider-labels">
+                <span>Serious problems / painful end</span>
+                <span>Married / forever committed</span>
+              </div>
+              <input type="range" name="rel1" min="1" max="7" value="4" />
+              <div class="value-bubble">4</div>
+            </div>
+          </div>
+
+          <div class="question-block">
+            <p class="question-text">2. What does the future of your relationship look like?</p>
+            <div class="slider-wrap">
+              <div class="slider-labels">
+                <span>Never speaking again</span>
+                <span>Getting married / together forever</span>
+              </div>
+              <input type="range" name="rel2" min="1" max="7" value="4" />
+              <div class="value-bubble">4</div>
+            </div>
+          </div>
+
+          <div class="question-block">
+            <p class="question-text">3. What are the other person's feelings about you?</p>
+            <div class="slider-wrap">
+              <div class="slider-labels">
+                <span>They hate me</span>
+                <span>Openly declared their love</span>
+              </div>
+              <input type="range" name="rel3" min="1" max="7" value="4" />
+              <div class="value-bubble">4</div>
+            </div>
+          </div>
+
+          <div class="question-block">
+            <p class="question-text">4. How much time do you spend together?</p>
+            <div class="slider-wrap">
+              <div class="slider-labels">
+                <span>Significant barriers, never together</span>
+                <span>Everything, always together</span>
+              </div>
+              <input type="range" name="rel4" min="1" max="7" value="4" />
+              <div class="value-bubble">4</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="section-label">✦ Your Inner World</div>
+
+          <div class="question-block">
+            <p class="question-text">5. Which best describes how you feel about yourself?</p>
+            <div class="slider-wrap">
+              <div class="slider-labels">
+                <span>Lots of problems, all my fault</span>
+                <span>I'm awesome, life is awesome!</span>
+              </div>
+              <input type="range" name="hap1" min="1" max="7" value="4" />
+              <div class="value-bubble">4</div>
+            </div>
+          </div>
+
+          <div class="question-block">
+            <p class="question-text">6. Which best describes your emotional state?</p>
+            <div class="slider-wrap">
+              <div class="slider-labels">
+                <span>Really angry / depressed</span>
+                <span>Actively making yourself &amp; others happy</span>
+              </div>
+              <input type="range" name="hap3" min="1" max="7" value="4" />
+              <div class="value-bubble">4</div>
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="submit-btn">✦ Find my Taylor Swift songs ✦</button>
+      </form>
+
+      <section id="results" class="hidden">
+        <header>
+          <div class="star">✦</div>
+          <h1>Your Taylor Swift songs</h1>
+          <p>Here are the top 5 songs that match your current mood</p>
+        </header>
+
+        <div class="dataset-panel">
+          <div class="dataset-label">✦ Dataset used</div>
+          <div class="dataset-title" id="result-dataset-title"></div>
+          <div class="dataset-desc" id="result-dataset-note"></div>
+        </div>
+
+        <div id="song-list"></div>
+
+        <div class="chart-card">
+          <div class="chart-label">✦ Your position in Taylor Swift's universe</div>
+          <p class="chart-desc" id="chart-description"></p>
+          <canvas id="songChart"></canvas>
+        </div>
+
+        <div class="actions">
+          <button type="button" class="back-btn" id="reset-view">✦ Try again</button>
+        </div>
+      </section>
+    </section>
+
+    <footer>taylorswift package by Megan Mansfield &amp; Adina Feinstein · MIT License · Static version for GitHub Pages</footer>
+  </div>
+
+  <script src="./app.js"></script>
+</body>
+</html>

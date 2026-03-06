@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Which Taylor Swift song are you?</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Georgia', serif;
+      background: linear-gradient(135deg, #1a0533 0%, #3b0764 50%, #1a0533 100%);
+      min-height: 100vh;
+      padding: 40px 16px;
+      color: #f3e8ff;
+    }
+
+    .container {
+      max-width: 740px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    header .star { font-size: 2rem; }
+
+    header h1 {
+      font-size: 2.2rem;
+      background: linear-gradient(90deg, #f9a8d4, #e879f9, #c084fc, #f9a8d4);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 8px 0 4px;
+      letter-spacing: 1px;
+    }
+
+    header p {
+      font-size: 0.95rem;
+      color: #d8b4fe;
+      font-style: italic;
+    }
+
+    .section-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: #c084fc;
+      margin-bottom: 16px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid #7e22ce44;
+    }
+
+    .card {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(192, 132, 252, 0.25);
+      border-radius: 16px;
+      padding: 28px 32px;
+      margin-bottom: 24px;
+      backdrop-filter: blur(6px);
+    }
+
+    .question-block {
+      margin-bottom: 28px;
+    }
+    .question-block:last-child { margin-bottom: 0; }
+
+    .question-text {
+      font-size: 1rem;
+      line-height: 1.55;
+      color: #f3e8ff;
+      margin-bottom: 14px;
+    }
+
+    .slider-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .slider-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.72rem;
+      color: #a78bfa;
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 6px;
+      border-radius: 4px;
+      background: linear-gradient(to right, #9333ea, #ec4899);
+      outline: none;
+      cursor: pointer;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #f9a8d4;
+      border: 3px solid #9333ea;
+      cursor: pointer;
+      box-shadow: 0 0 8px rgba(233, 121, 249, 0.6);
+      transition: background 0.2s;
+    }
+
+    input[type="range"]::-webkit-slider-thumb:hover {
+      background: #e879f9;
+    }
+
+    .value-bubble {
+      text-align: center;
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: #f9a8d4;
+      height: 24px;
+    }
+
+    .dataset-toggle {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .dataset-option {
+      display: block;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .dataset-option input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .dataset-card {
+      border: 1px solid rgba(192, 132, 252, 0.25);
+      border-radius: 14px;
+      padding: 16px 18px;
+      background: rgba(255,255,255,0.035);
+      transition: border-color 0.2s, background 0.2s, transform 0.1s;
+      min-height: 100%;
+    }
+
+    .dataset-option input:checked + .dataset-card {
+      border-color: rgba(249, 168, 212, 0.7);
+      background: rgba(147, 51, 234, 0.14);
+      box-shadow: 0 0 0 1px rgba(249, 168, 212, 0.16);
+    }
+
+    .dataset-title {
+      font-size: 0.95rem;
+      color: #f9a8d4;
+      margin-bottom: 6px;
+      font-weight: bold;
+    }
+
+    .dataset-meta {
+      font-size: 0.76rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: #c084fc;
+      margin-bottom: 8px;
+    }
+
+    .dataset-desc {
+      font-size: 0.84rem;
+      line-height: 1.55;
+      color: #d8b4fe;
+    }
+
+    .dataset-desc strong {
+      color: #f9a8d4;
+    }
+
+    .submit-btn {
+      display: block;
+      width: 100%;
+      padding: 16px;
+      font-size: 1.1rem;
+      font-family: 'Georgia', serif;
+      letter-spacing: 1px;
+      background: linear-gradient(90deg, #9333ea, #ec4899);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: opacity 0.2s, transform 0.1s;
+    }
+
+    .submit-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+    .submit-btn:active { transform: translateY(0); }
+
+    /* Study explainer */
+    .explainer {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(192,132,252,0.2);
+      border-radius: 12px;
+      margin-bottom: 28px;
+      overflow: hidden;
+    }
+    .explainer summary {
+      padding: 13px 20px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      color: #c084fc;
+      letter-spacing: 1px;
+      list-style: none;
+      user-select: none;
+    }
+    .explainer summary::-webkit-details-marker { display: none; }
+    .explainer[open] summary { border-bottom: 1px solid rgba(192,132,252,0.2); }
+    .explainer-body {
+      padding: 16px 20px;
+      font-size: 0.875rem;
+      line-height: 1.7;
+      color: #d8b4fe;
+    }
+    .explainer-body strong { color: #f9a8d4; }
+    .explainer-body p { margin-bottom: 12px; }
+    .explainer-body p:last-child { margin-bottom: 0; }
+    .dim-table { width: 100%; border-collapse: collapse; margin-bottom: 14px; }
+    .dim-table td { padding: 5px 10px; font-size: 0.82rem; }
+    .dim-table td:first-child { color: #f9a8d4; font-style: italic; white-space: nowrap; padding-right: 16px; }
+    .dim-table tr:nth-child(odd) td { background: rgba(255,255,255,0.03); border-radius: 4px; }
+    .mode-note {
+      margin-top: 12px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: rgba(236, 72, 153, 0.08);
+      border: 1px solid rgba(249, 168, 212, 0.16);
+      color: #f3c8ea;
+      font-size: 0.82rem;
+      line-height: 1.6;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 32px;
+      font-size: 0.8rem;
+      color: #7c3aed88;
+    }
+
+    @media (max-width: 700px) {
+      .dataset-toggle {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="star">✦</div>
+      <h1>Which Taylor Swift song are you?</h1>
+      <p>Answer honestly and find your perfect match</p>
+    </header>
+
+    <form action="/result" method="POST">
+
+      <div class="card">
+        <div class="section-label">✦ Dataset</div>
+
+        <div class="dataset-toggle">
+          <label class="dataset-option">
+            <input type="radio" name="dataset" value="study" checked />
+            <div class="dataset-card">
+              <div class="dataset-title">Original study</div>
+              <div class="dataset-meta">149 songs · human-scored</div>
+
+            </div>
+          </label>
+
+          <label class="dataset-option">
+            <input type="radio" name="dataset" value="combined" />
+            <div class="dataset-card">
+              <div class="dataset-title">Expanded catalog</div>
+              <div class="dataset-meta">240 songs · study + AI extension</div>
+              <div class="dataset-desc">Scores for added songs estimated via AI analysis.</div>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <details class="explainer">
+        <summary id="explainer-summary">✦ How does this work? (Original study)</summary>
+        <div class="explainer-body" id="explainer-body">
+          <p>This tool is based on a project by astronomer <strong>Megan Mansfield</strong> (University of Chicago). Each of Taylor Swift's <strong>149 songs</strong> was manually scored on <strong>6 emotional dimensions</strong>, each using <strong>7 integer levels</strong> (−3 → 0 → +3):</p>
+          <table class="dim-table">
+            <tr><td>Feelings of self</td><td>How good the protagonist feels about themselves</td></tr>
+            <tr><td>Emotional stage</td><td>Anger &amp; depression → actively seeking happiness</td></tr>
+            <tr><td>Relationship seriousness</td><td>Quality and depth of the relationship portrayed</td></tr>
+            <tr><td>Future prospects</td><td>Outlook for the relationship's future</td></tr>
+            <tr><td>Other person's feelings</td><td>How the other person feels about the protagonist</td></tr>
+            <tr><td>Togetherness</td><td>How much time they spend together</td></tr>
+          </table>
+          <p>The sliders (1–7) map directly onto that same scale, so your answers and the song scores are directly comparable. The algorithm then picks the 5 songs with the smallest <strong>Euclidean distance</strong> to your position in this 6-dimensional space. The results page shows a 2-D projection so you can see where you land in Taylor Swift's emotional universe.</p>
+        </div>
+      </details>
+
+      <!-- RELATIONSHIP SECTION -->
+      <div class="card">
+        <div class="section-label">✦ Relationship &amp; Love</div>
+        <p style="font-size:0.85rem; color:#c084fc; margin-bottom:20px; font-style:italic;">
+          If you're in a relationship, answer about your current one. Otherwise, think about your most recent or a potential one.
+        </p>
+
+        <div class="question-block">
+          <p class="question-text">1. Which of these best describes your relationship?</p>
+          <div class="slider-wrap">
+            <div class="slider-labels">
+              <span>Serious problems / painful end</span>
+              <span>Married / forever committed</span>
+            </div>
+            <input type="range" name="rel1" min="1" max="7" value="4"
+                   oninput="this.nextElementSibling.textContent=this.value" />
+            <div class="value-bubble">4</div>
+          </div>
+        </div>
+
+        <div class="question-block">
+          <p class="question-text">2. What does the future of your relationship look like?</p>
+          <div class="slider-wrap">
+            <div class="slider-labels">
+              <span>Never speaking again</span>
+              <span>Getting married / together forever</span>
+            </div>
+            <input type="range" name="rel2" min="1" max="7" value="4"
+                   oninput="this.nextElementSibling.textContent=this.value" />
+            <div class="value-bubble">4</div>
+          </div>
+        </div>
+
+        <div class="question-block">
+          <p class="question-text">3. What are the other person's feelings about you?</p>
+          <div class="slider-wrap">
+            <div class="slider-labels">
+              <span>They hate me</span>
+              <span>Openly declared their love</span>
+            </div>
+            <input type="range" name="rel3" min="1" max="7" value="4"
+                   oninput="this.nextElementSibling.textContent=this.value" />
+            <div class="value-bubble">4</div>
+          </div>
+        </div>
+
+        <div class="question-block">
+          <p class="question-text">4. How much time do you spend together?</p>
+          <div class="slider-wrap">
+            <div class="slider-labels">
+              <span>Significant barriers, never together</span>
+              <span>Everything, always together</span>
+            </div>
+            <input type="range" name="rel4" min="1" max="7" value="4"
+                   oninput="this.nextElementSibling.textContent=this.value" />
+            <div class="value-bubble">4</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PERSONAL SECTION -->
+      <div class="card">
+        <div class="section-label">✦ Your Inner World</div>
+
+        <div class="question-block">
+          <p class="question-text">5. Which best describes how you feel about yourself?</p>
+          <div class="slider-wrap">
+            <div class="slider-labels">
+              <span>Lots of problems, all my fault</span>
+              <span>I'm awesome, life is awesome!</span>
+            </div>
+            <input type="range" name="hap1" min="1" max="7" value="4"
+                   oninput="this.nextElementSibling.textContent=this.value" />
+            <div class="value-bubble">4</div>
+          </div>
+        </div>
+
+        <div class="question-block">
+          <p class="question-text">6. Which best describes your emotional state?</p>
+          <div class="slider-wrap">
+            <div class="slider-labels">
+              <span>Really angry / depressed</span>
+              <span>Actively making yourself &amp; others happy</span>
+            </div>
+            <input type="range" name="hap3" min="1" max="7" value="4"
+                   oninput="this.nextElementSibling.textContent=this.value" />
+            <div class="value-bubble">4</div>
+          </div>
+        </div>
+      </div>
+
+      <button type="submit" class="submit-btn">✦ Find my Taylor Swift songs ✦</button>
+    </form>
+
+    <footer>taylorswift package by Megan Mansfield &amp; Adina Feinstein · MIT License · Made by MakeIt</footer>
+  </div>
+
+  <script>
+    const studyExplainer = {
+      summary: '✦ How does this work? (Original study)',
+      body: `
+        <p>This tool is based on a project by astronomer <strong>Megan Mansfield</strong> (University of Chicago). Each of Taylor Swift's <strong>149 songs</strong> was manually scored on <strong>6 emotional dimensions</strong>, each using <strong>7 integer levels</strong> (−3 → 0 → +3):</p>
+        <table class="dim-table">
+          <tr><td>Feelings of self</td><td>How good the protagonist feels about themselves</td></tr>
+          <tr><td>Emotional stage</td><td>Anger &amp; depression → actively seeking happiness</td></tr>
+          <tr><td>Relationship seriousness</td><td>Quality and depth of the relationship portrayed</td></tr>
+          <tr><td>Future prospects</td><td>Outlook for the relationship's future</td></tr>
+          <tr><td>Other person's feelings</td><td>How the other person feels about the protagonist</td></tr>
+          <tr><td>Togetherness</td><td>How much time they spend together</td></tr>
+        </table>
+        <p>The sliders (1–7) map directly onto that same scale, so your answers and the song scores are directly comparable. The algorithm then picks the 5 songs with the smallest <strong>Euclidean distance</strong> to your position in this 6-dimensional space. The results page shows a 2-D projection so you can see where you land in Taylor Swift's emotional universe.</p>
+      `
+    };
+
+    const combinedExplainer = {
+      summary: '✦ How does this work? (Expanded catalog)',
+      body: `
+        <p>This mode keeps the original <strong>149 human-scored study songs</strong> and adds <strong>91 extra songs</strong> that were missing from the package dataset.</p>
+        <table class="dim-table">
+          <tr><td>Feelings of self</td><td>How good the protagonist feels about themselves</td></tr>
+          <tr><td>Emotional stage</td><td>Anger &amp; depression → actively seeking happiness</td></tr>
+          <tr><td>Relationship seriousness</td><td>Quality and depth of the relationship portrayed</td></tr>
+          <tr><td>Future prospects</td><td>Outlook for the relationship's future</td></tr>
+          <tr><td>Other person's feelings</td><td>How the other person feels about the protagonist</td></tr>
+          <tr><td>Togetherness</td><td>How much time they spend together</td></tr>
+        </table>
+        <p>The extra songs were scored on the same <strong>−3 to +3</strong> scale, but <strong>they are not part of the original study</strong>. Their scores were estimated by averaging <strong>4 separate AI lyric analyses</strong>, then rounding back to the original discrete scale.</p>
+        <p>The test still compares your answers against all songs in a 6-dimensional space and returns the closest matches, but this expanded mode mixes <strong>study data</strong> with <strong>AI-averaged estimates</strong>.</p>
+        <div class="mode-note">Use this mode if you want broader coverage of the discography. Use <strong>Original study</strong> if you want to stay strictly within the published human-scored dataset.</div>
+      `
+    };
+
+    const summaryEl = document.getElementById('explainer-summary');
+    const bodyEl = document.getElementById('explainer-body');
+    const datasetInputs = document.querySelectorAll('input[name="dataset"]');
+
+    function updateExplainer() {
+      const selected = document.querySelector('input[name="dataset"]:checked')?.value || 'study';
+      const content = selected === 'combined' ? combinedExplainer : studyExplainer;
+      summaryEl.textContent = content.summary;
+      bodyEl.innerHTML = content.body;
+    }
+
+    datasetInputs.forEach((input) => input.addEventListener('change', updateExplainer));
+    updateExplainer();
+  </script>
+</body>
+</html>
