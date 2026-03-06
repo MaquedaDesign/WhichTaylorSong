@@ -181,7 +181,7 @@ function renderChart(dataset, topSongs, values) {
     },
     options: {
       responsive: true,
-      layout: { padding: { top: 24, right: 20 } },
+      layout: { padding: { top: 24, right: 28, bottom: 16, left: 16 } },
       plugins: {
         legend: {
           labels: { color: '#d8b4fe', font: { family: 'Georgia', size: 12 } },
